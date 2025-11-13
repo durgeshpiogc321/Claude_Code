@@ -16,7 +16,10 @@
       "Bash(timeout:*)",
       "Bash(ping:*)",
       "Bash(curl:*)",
-      "Bash(Select-String -Pattern \"(Passed|Failed|Total|Test Run|UserRepository)\")"
+      "Bash(Select-String -Pattern \"(Passed|Failed|Total|Test Run|UserRepository)\")",
+      "Bash(taskkill:*)",
+      "Bash(taskkill /F /IM LoginandRegisterMVC.exe:*)",
+      "Bash(powershell -Command \"Stop-Process -Id 12804 -Force\")"
     ],
     "deny": [],
     "ask": []

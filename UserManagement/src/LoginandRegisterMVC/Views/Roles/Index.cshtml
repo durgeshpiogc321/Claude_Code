@@ -1,0 +1,145 @@
+@model IEnumerable<LoginandRegisterMVC.Models.Role>
+
+@{
+    ViewData["Title"] = "Role Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- TempData Alerts -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> @TempData["Success"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> @TempData["Error"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-user-tag"></i> Role Management</h2>
+        <p class="text-muted">Manage custom user roles and permissions</p>
+    </div>
+    <div class="col-md-4 text-right">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Role
+        </a>
+        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-users"></i> User List
+        </a>
+    </div>
+</div>
+
+<!-- Roles Table -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-list"></i> Available Roles</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var role in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@role.RoleName</strong>
+                                </td>
+                                <td>@role.Description</td>
+                                <td>
+                                    @if (role.IsSystemRole)
+                                    {
+                                        <span class="badge badge-info">
+                                            <i class="fas fa-lock"></i> System Role
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-user-cog"></i> Custom Role
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@role.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td>
+                                    <small>@role.UpdatedAt.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td class="text-center">
+                                    @if (!role.IsSystemRole)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@role.RoleName" class="btn btn-sm btn-warning" title="Edit Role">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this role? This cannot be undone.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="roleName" value="@role.RoleName" />
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete Role">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            <i class="fas fa-lock"></i> Protected
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted text-center">No roles found.</p>
+        }
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Role Management Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>System Roles</strong> (Admin, User) are protected and cannot be modified or deleted.</li>
+                    <li><strong>Custom Roles</strong> can be created to define specific permission levels for users.</li>
+                    <li>Roles cannot be deleted if they are assigned to any users.</li>
+                    <li>Role names must be unique and cannot contain special characters.</li>
+                    <li>Use descriptive names and clear descriptions for better organization.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
