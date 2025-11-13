@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LoginandRegisterMVC": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:62406;http://localhost:62407"
+    }
+  }
+}

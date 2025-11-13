@@ -1,0 +1,46 @@
+@model IEnumerable<LoginandRegisterMVC.Models.User>
+
+@{
+    ViewData["Title"] = "Dashboard Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Dashboard Home</h2>
+
+Hello @Context.Session.GetString("Username")
+
+<p>
+    <a asp-action="Register">Registration</a>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Username)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Role)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Username)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Role)
+        </td>
+    </tr>
+}
+
+</table>
+<p>
+    <a asp-action="Logout">Logout</a>
+</p>
