@@ -1,0 +1,262 @@
+@model LoginandRegisterMVC.ViewModels.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-info">
+            <i class="fas fa-eye"></i> View Details
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Edit Form Card -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h4><i class="fas fa-edit"></i> Edit User Information</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+                    <input type="hidden" asp-for="LastLoginAt" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- Email (Read-Only) -->
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">
+                            <i class="fas fa-envelope"></i> Email (ID):
+                        </label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" value="@Model.UserId" readonly disabled />
+                            <small class="form-text text-muted">Email cannot be changed after registration.</small>
+                        </div>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="form-group row">
+                        <label asp-for="Username" class="col-md-3 col-form-label">
+                            <i class="fas fa-user"></i> Username:
+                        </label>
+                        <div class="col-md-9">
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="form-group row">
+                        <label asp-for="Role" class="col-md-3 col-form-label">
+                            <i class="fas fa-shield-alt"></i> Role:
+                        </label>
+                        <div class="col-md-9">
+                            <select asp-for="Role" class="form-control">
+                                @foreach (var role in ViewBag.Roles as List<LoginandRegisterMVC.Models.Role>)
+                                {
+                                    <option value="@role.RoleName" selected="@(Model.Role == role.RoleName)">
+                                        @role.RoleName
+                                        @if (role.IsSystemRole)
+                                        {
+                                            <text> (System)</text>
+                                        }
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Select a role for this user. System roles cannot be modified.
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Account Status -->
+                    <div class="form-group row">
+                        <label asp-for="IsActive" class="col-md-3 col-form-label">
+                            <i class="fas fa-toggle-on"></i> Account Status:
+                        </label>
+                        <div class="col-md-9">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch" />
+                                <label class="custom-control-label" for="isActiveSwitch">
+                                    Active (user can login)
+                                </label>
+                            </div>
+                            <span asp-validation-for="IsActive" class="text-danger"></span>
+                            <small class="form-text text-muted">Inactive users cannot login to the system.</small>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Action Buttons -->
+                    <div class="form-group row">
+                        <div class="col-md-9 offset-md-3">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Sidebar -->
+    <div class="col-md-4">
+        <!-- Account Information Card -->
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong><i class="fas fa-calendar-plus"></i> Created:</strong>
+                    <br />
+                    <small class="text-muted">
+                        @Model.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+                    </small>
+                </div>
+
+                @if (Model.LastLoginAt.HasValue)
+                {
+                    <div class="mb-3">
+                        <strong><i class="fas fa-clock"></i> Last Login:</strong>
+                        <br />
+                        <small class="text-muted">
+                            @Model.LastLoginAt.Value.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+                        </small>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-3">
+                        <strong><i class="fas fa-clock"></i> Last Login:</strong>
+                        <br />
+                        <small class="text-muted">Never logged in</small>
+                    </div>
+                }
+
+                <div>
+                    <strong><i class="fas fa-fingerprint"></i> User ID:</strong>
+                    <br />
+                    <small class="text-muted text-break">@Model.UserId</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Picture Card -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-image"></i> Profile Picture</h5>
+            </div>
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                {
+                    <img src="@Model.ProfilePicture" alt="Profile Picture" class="img-thumbnail mb-3" style="max-width: 200px; max-height: 200px;" />
+                }
+                else
+                {
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-5x text-muted"></i>
+                        <p class="text-muted mt-2">No profile picture</p>
+                    </div>
+                }
+
+                <!-- Upload Form -->
+                <form asp-action="UploadProfilePicture" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+
+                    <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="profilePicture" name="profilePicture" accept="image/*" required>
+                        <label class="custom-file-label" for="profilePicture">Choose image...</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm btn-block">
+                        <i class="fas fa-upload"></i> Upload Picture
+                    </button>
+                </form>
+
+                @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                {
+                    <!-- Remove Form -->
+                    <form asp-action="RemoveProfilePicture" method="post" class="mt-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="userId" value="@Model.UserId" />
+                        <button type="submit" class="btn btn-danger btn-sm btn-block" onclick="return confirm('Are you sure you want to remove the profile picture?');">
+                            <i class="fas fa-trash"></i> Remove Picture
+                        </button>
+                    </form>
+                }
+
+                <small class="text-muted mt-2 d-block">
+                    Max size: 5MB<br/>
+                    Formats: JPG, PNG, GIF
+                </small>
+            </div>
+        </div>
+
+        <!-- Help & Tips Card -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-question-circle"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>Username should be unique and easy to remember</li>
+                    <li>Only assign Admin role to trusted users</li>
+                    <li>Inactive users cannot access the system</li>
+                    <li>Email address cannot be changed once registered</li>
+                    <li>All changes are logged for security</li>
+                    <li>Profile pictures help identify users quickly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Confirm before changing role to Admin
+            $('#Role').on('change', function() {
+                if ($(this).val() === 'Admin') {
+                    if (!confirm('Are you sure you want to assign Admin role to this user? Admins have full system access.')) {
+                        $(this).val('User');
+                    }
+                }
+            });
+
+            // Warn when deactivating account
+            $('#isActiveSwitch').on('change', function() {
+                if (!$(this).is(':checked')) {
+                    if (!confirm('Are you sure you want to deactivate this account? The user will not be able to login.')) {
+                        $(this).prop('checked', true);
+                    }
+                }
+            });
+
+            // Update file input label with selected filename
+            $('#profilePicture').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName || 'Choose image...');
+            });
+        });
+    </script>
+}

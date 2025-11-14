@@ -58,6 +58,10 @@ builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 // Repository Pattern: Add user repository for data access abstraction
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// Service Layer: Add business logic services
+builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 // SECURITY FIX: Add rate limiting to prevent brute force attacks
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));

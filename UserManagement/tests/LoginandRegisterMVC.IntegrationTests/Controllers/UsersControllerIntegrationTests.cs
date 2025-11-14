@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace LoginandRegisterMVC.IntegrationTests.Controllers;
 
@@ -44,7 +45,10 @@ public class UsersControllerIntegrationTests
                 });
             });
 
-        _client = _factory.CreateClient();
+        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false // Don't follow redirects automatically
+        });
     }
 
     [TearDown]
@@ -96,18 +100,19 @@ public class UsersControllerIntegrationTests
     [Test]
     public async Task Post_Login_WithInvalidCredentials_ReturnsLoginPageWithError()
     {
-        // Arrange
+        // Arrange - Get the login page first to get anti-forgery token
+        var loginPage = await _client.GetAsync("/Users/Login");
+        var loginContent = await loginPage.Content.ReadAsStringAsync();
+        var antiForgeryToken = ExtractAntiForgeryToken(loginContent);
+
         var formData = new Dictionary<string, string>
         {
-            {"UserId", "invalid@email.com"},
-            {"Password", "wrongpassword"}
+            {"Email", "invalid@email.com"},  // Changed from UserId to Email
+            {"Password", "wrongpassword"},
+            {"__RequestVerificationToken", antiForgeryToken}
         };
         var formContent = new FormUrlEncodedContent(formData);
 
-        // Get the login page first to get anti-forgery token
-        var loginPage = await _client.GetAsync("/Users/Login");
-        var loginContent = await loginPage.Content.ReadAsStringAsync();
-        
         // Act
         var response = await _client.PostAsync("/Users/Login", formContent);
 
@@ -115,5 +120,14 @@ public class UsersControllerIntegrationTests
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var content = await response.Content.ReadAsStringAsync();
         Assert.That(content, Does.Contain("LOGIN"));
+    }
+
+    /// <summary>
+    /// Helper method to extract anti-forgery token from HTML content
+    /// </summary>
+    private static string ExtractAntiForgeryToken(string htmlContent)
+    {
+        var match = Regex.Match(htmlContent, @"<input name=""__RequestVerificationToken"" type=""hidden"" value=""([^""]+)""");
+        return match.Success ? match.Groups[1].Value : string.Empty;
     }
 }

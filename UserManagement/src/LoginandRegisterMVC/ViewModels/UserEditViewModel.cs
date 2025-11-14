@@ -32,6 +32,9 @@ public class UserEditViewModel
     [Display(Name = "Current Profile Picture")]
     public string? CurrentProfilePicture { get; set; }
 
+    // Alias for convenience in views
+    public string? ProfilePicture => CurrentProfilePicture;
+
     // Optional password change fields
     [DataType(DataType.Password)]
     [StringLength(500, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters long")]

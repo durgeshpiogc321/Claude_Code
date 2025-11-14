@@ -1,0 +1,63 @@
+@model LoginandRegisterMVC.Models.Role
+
+@{
+    ViewData["Title"] = "Create Role";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-plus-circle"></i> Create New Role</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- Role Name -->
+                    <div class="form-group">
+                        <label asp-for="RoleName" class="control-label">
+                            <i class="fas fa-tag"></i> Role Name:
+                        </label>
+                        <input asp-for="RoleName" class="form-control" placeholder="e.g. Manager, Moderator" />
+                        <span asp-validation-for="RoleName" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Enter a unique name for the role (e.g., Manager, Moderator, Guest)
+                        </small>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label">
+                            <i class="fas fa-align-left"></i> Description:
+                        </label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Brief description of the role and its permissions"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Provide a clear description of what this role represents
+                        </small>
+                    </div>
+
+                    <hr />
+
+                    <!-- Action Buttons -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Create Role
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/jquery.validate.unobtrusive.min.js"></script>
+}

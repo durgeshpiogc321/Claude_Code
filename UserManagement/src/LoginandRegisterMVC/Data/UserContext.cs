@@ -10,6 +10,7 @@ public class UserContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Role> Roles { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,6 +58,42 @@ public class UserContext : DbContext
 
             // Global query filter to exclude soft-deleted users by default
             entity.HasQueryFilter(e => !e.IsDeleted);
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleName);
+            entity.Property(e => e.RoleName).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(200);
+
+            // Configure DateTime columns
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Seed default roles
+            entity.HasData(
+                new Role
+                {
+                    RoleName = "Admin",
+                    Description = "System administrator with full access",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Role
+                {
+                    RoleName = "User",
+                    Description = "Standard user with limited access",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                }
+            );
         });
     }
 }

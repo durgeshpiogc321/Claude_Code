@@ -19,7 +19,7 @@ public class UserListViewModel
 /// </summary>
 public class UserListPageViewModel
 {
-    public IEnumerable<UserListViewModel> Users { get; set; } = new List<UserListViewModel>();
+    public IEnumerable<Models.User> Users { get; set; } = new List<Models.User>();
 
     // Pagination
     public int CurrentPage { get; set; } = 1;
